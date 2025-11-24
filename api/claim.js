@@ -1,35 +1,31 @@
-// api/claim.js
+// pages/api/claim.js (Next.js)
+import fetch from "node-fetch"; // only needed for Next.js < 13.4
+
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
   try {
-    const { latitude, longitude, accuracy, timestamp, userAgent } = req.body;
+    const data = req.body;
 
-    // Simple validation
-    if (
-      typeof latitude !== "number" ||
-      typeof longitude !== "number" ||
-      typeof accuracy !== "number"
-    ) {
-      return res.status(400).json({ error: "Invalid data" });
-    }
+    // Google Apps Script URL
+    const GOOGLE_SCRIPT_URL =
+      "https://script.google.com/macros/s/AKfycbw6XSrCvkw9-iDpZEUX-XVDsMn4ZGqFHsAG3Lt1V1IzsoVAPJz2dKWMJlIdYYKI3SU/exec"; // replace with your URL
 
-    // Here you can save the data to a database or Google Sheet
-    // Example: console.log
-    console.log("Claim received:", {
-      latitude,
-      longitude,
-      accuracy,
-      timestamp,
-      userAgent,
+    // Send POST request to Google Apps Script
+    const googleRes = await fetch(GOOGLE_SCRIPT_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
     });
 
-    // Respond with JSON
-    return res.status(200).json({ message: "Claim received successfully!" });
-  } catch (error) {
-    console.error("Error in /api/claim:", error);
-    return res.status(500).json({ error: "Internal Server Error" });
+    const resultText = await googleRes.text(); // Apps Script usually returns plain text
+
+    // Respond to frontend
+    res.status(200).json({ message: "Claim sent!", sheetResponse: resultText });
+  } catch (err) {
+    console.error("Error sending to Google Sheet:", err);
+    res.status(500).json({ error: "Failed to send claim" });
   }
 }

