@@ -283,14 +283,13 @@
             };
 
             try {
-              // Call Next.js API
               const res = await fetch("/api/claim", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(locationData),
               });
 
-              const data = await res.json();
+              const data = await res.json(); // safe now
 
               if (res.ok) {
                 showStatus(
@@ -299,7 +298,10 @@
                 );
                 btn.textContent = "🎉 Claimed!";
               } else {
-                showStatus("error", "❌ Error sending data: " + data.error);
+                showStatus(
+                  "error",
+                  "❌ Error sending data: " + (data.error || "unknown")
+                );
                 btn.disabled = false;
                 btn.textContent = "🎉 Click To Get Free Gift";
               }
